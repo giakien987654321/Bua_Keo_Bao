@@ -1,7 +1,7 @@
 @echo off
 chcp 65001 >nul
 cd /d "%~dp0"
-echo Tao moi truong rieng trong thu muc Keo-Bua-Bao...
+echo Dang cai dat...
 if exist ".venv\Scripts\python.exe" goto install
 where py >nul 2>&1
 if errorlevel 1 goto use_python
@@ -16,12 +16,11 @@ if errorlevel 1 goto failed
 ".venv\Scripts\python.exe" -m pip install -r requirements.txt
 if errorlevel 1 goto failed
 echo.
-echo Cai dat xong. Mo CHAY_GAME.bat de choi.
+echo Cai dat xong. Mo CHAY_GAME.bat de chay.
 pause
 exit /b 0
 :failed
 echo.
-echo Cai dat chua thanh cong. Hay chup lai thong bao loi phia tren.
-echo Khong can xoa hoac sua thu muc du an cu.
+echo Cai dat that bai.
 pause
 exit /b 1
