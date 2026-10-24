@@ -1,5 +1,4 @@
 """Chạy file này để mở trò chơi kéo–búa–bao hai tay."""
-
 import math
 import sys
 import time
@@ -16,7 +15,7 @@ from mediapipe.tasks.python import vision
 from luat_choi import nhan_dien, chia_hai_ben, cap_on_dinh, tim_ben_thang
 
 THU_MUC = Path(__file__).resolve().parent
-SO_CAMERA = 0  # Đổi thành 1 nếu dùng camera khác.
+SO_CAMERA = 0  
 GIAY_DEM = 3
 NEN = "#f1f5f9"
 XANH = "#1d4ed8"
@@ -24,7 +23,6 @@ CAM = "#c2410c"
 
 
 def mo_camera():
-    # Windows: thử DirectShow trước, sau đó thử cách mở mặc định.
     if sys.platform == "win32":
         cam = cv2.VideoCapture(SO_CAMERA, cv2.CAP_DSHOW)
         if cam.isOpened():
@@ -38,7 +36,6 @@ def mo_camera():
 def ve_khung(anh, tay, mau):
     cao, rong = anh.shape[:2]
     diem = [(int(p.x * rong), int(p.y * cao)) for p in tay]
-    # Nối các khớp trên từng ngón; chỉ để người chơi nhìn thấy kết quả dò tay.
     for ngon in [[0, 1, 2, 3, 4], [0, 5, 6, 7, 8], [5, 9, 10, 11, 12],
                  [9, 13, 14, 15, 16], [13, 17, 18, 19, 20], [0, 17]]:
         for i in range(len(ngon) - 1):
@@ -98,8 +95,6 @@ def main():
         thong_bao = tk.Label(cua_so, text="Bấm Bắt đầu để chơi một lượt", bg=NEN,
                             fg="#0f172a", font=("Arial", 17, "bold"))
         thong_bao.pack(pady=4)
-
-        # Trạng thái lượt chơi: cho -> dem -> xong. Chỉ cộng điểm khi dem -> xong.
         diem = [0, 0]
         lich_su = []
         trang_thai = "cho"
@@ -144,7 +139,7 @@ def main():
 
         def phim_cach(event):
             choi_luot()
-            return "break"  # Không để phím cách kích hoạt nút đang được focus.
+            return "break"  
 
         cua_so.bind("<space>", phim_cach)
         for nut in (nut_choi, nut_xoa, nut_thoat):
@@ -161,7 +156,6 @@ def main():
             if not ok:
                 so_loi += 1
                 lich_su.clear()
-                # Hủy lượt đang đếm để không chấm điểm bằng ảnh cũ.
                 if trang_thai == "dem":
                     trang_thai = "xong"
                     nut_choi.configure(state="normal")
@@ -212,7 +206,7 @@ def main():
                         phai.configure(text=f"BÊN PHẢI: {diem[1]}")
 
             hinh = Image.fromarray(cv2.cvtColor(anh, cv2.COLOR_BGR2RGB))
-            hinh.thumbnail((900, 440))  # Giữ tỉ lệ ảnh, vừa màn hình laptop.
+            hinh.thumbnail((900, 440)) 
             anh_tk = ImageTk.PhotoImage(hinh)
             vung_anh.configure(image=anh_tk)
             vung_anh.image = anh_tk
