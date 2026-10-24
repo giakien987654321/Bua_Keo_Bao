@@ -26,26 +26,23 @@ def main():
     cua_so.configure(bg=NEN)
     cua_so.attributes("-fullscreen", True)
 
-    # Hàng chứa camera nhận toàn bộ phần diện tích còn lại.
-    cua_so.columnconfigure(0, weight=1)
-    cua_so.rowconfigure(2, weight=1)
-    def nhan(chu, hang, co=16, mau="#172033"):
-        label = tk.Label(cua_so, text=chu, font=("Arial", co), bg=NEN, fg=mau)
-        label.grid(row=hang, column=0, pady=5, sticky="ew")
+    # Camera là nền toàn cửa sổ; nhãn chỉ có nền trắng quanh chữ.
+    camera = tk.Label(cua_so, bg="black", borderwidth=0)
+    camera.place(x=0, y=0, relwidth=1, relheight=1)
+
+    def nhan(chu, x, y, co=16, mau="#172033", anchor="n"):
+        label = tk.Label(cua_so, text=chu, font=("Arial", co),
+                         bg="white", fg=mau, padx=8, pady=3)
+        label.place(relx=x, rely=y, anchor=anchor)
         return label
 
-    nhan("KÉO BÚA BAO  |  Mỗi bên một tay", 0, 22)
-    bang_diem = nhan("BÊN TRÁI: 0                    BÊN PHẢI: 0", 1, 20, "#185abd")
-    khung = tk.Frame(cua_so, bg="#172033")
-    khung.grid(row=2, column=0, sticky="nsew", padx=12)
-    # place không để kích thước ảnh ép cửa sổ lớn dần.
-    camera = tk.Label(khung, bg="#172033")
-    camera.place(relx=0.5, rely=0.5, anchor="center")
-    cu_chi = nhan("Bên trái: Chưa rõ    |    Bên phải: Chưa rõ", 3)
-    thong_bao = nhan("Bấm Bắt đầu rồi giữ cử chỉ đến hết đếm ngược", 4, 18)
-    hang_nut = tk.Frame(cua_so, bg=NEN)
-    hang_nut.grid(row=5, column=0, pady=8)
-    nhan("Phím cách: bắt đầu  |  R: đặt lại  |  F11: toàn màn hình  |  Esc: thoát", 6, 11)
+    nhan("KÉO BÚA BAO", .5, .02, 21)
+    diem_trai = nhan("BÊN TRÁI: 0", .2, .09, 18, "#185abd")
+    diem_phai = nhan("BÊN PHẢI: 0", .8, .09, 18, "#b94715")
+    cu_chi = nhan("Bên trái: Chưa rõ    |    Bên phải: Chưa rõ", .5, .76, 14)
+    thong_bao = nhan("Bấm Bắt đầu và giữ cử chỉ đến hết đếm ngược", .5, .82, 16)
+    nhan("Phím cách: bắt đầu  |  R: đặt lại  |  F11: toàn màn hình  |  Esc: thoát",
+         .5, .99, 10, anchor="s")
 
     diem = [0, 0]
     lich_su = []
@@ -67,7 +64,8 @@ def main():
         dang_dem = False
         diem[:] = [0, 0]
         lich_su.clear()
-        bang_diem.configure(text="BÊN TRÁI: 0                    BÊN PHẢI: 0")
+        diem_trai.configure(text="BÊN TRÁI: 0")
+        diem_phai.configure(text="BÊN PHẢI: 0")
         thong_bao.configure(text="Đã đặt lại điểm. Bấm Bắt đầu để chơi.")
         nut_choi.configure(state="normal")
 
@@ -78,12 +76,12 @@ def main():
     def doi_man_hinh(event=None):
         cua_so.attributes("-fullscreen", not cua_so.attributes("-fullscreen"))
 
-    nut_choi = tk.Button(hang_nut, text="Bắt đầu", command=choi, bg="#185abd", fg="white")
-    nut_xoa = tk.Button(hang_nut, text="Đặt lại điểm", command=dat_lai)
-    nut_thoat = tk.Button(hang_nut, text="Thoát", command=thoat)
-    for nut in (nut_choi, nut_xoa, nut_thoat):
-        nut.configure(font=("Arial", 14), width=14, pady=7)
-        nut.pack(side="left", padx=6)
+    nut_choi = tk.Button(cua_so, text="Bắt đầu", command=choi, bg="#185abd", fg="white")
+    nut_xoa = tk.Button(cua_so, text="Đặt lại điểm", command=dat_lai)
+    nut_thoat = tk.Button(cua_so, text="Thoát", command=thoat)
+    for i, nut in enumerate((nut_choi, nut_xoa, nut_thoat)):
+        nut.configure(font=("Arial", 13), width=13, pady=5)
+        nut.place(relx=.25 + .25*i, rely=.92, anchor="center")
         nut.bind("<space>", choi)
     for phim, ham in [("<space>", choi), ("<r>", dat_lai), ("<R>", dat_lai),
                       ("<Escape>", thoat), ("<F11>", doi_man_hinh)]:
@@ -95,7 +93,7 @@ def main():
     try:
         model = Path(__file__).resolve().parent / "models" / "hand_landmarker.task"
         tuy_chon = vision.HandLandmarkerOptions(
-            base_options=python.BaseOptions(model_asset_buffer=model.read_bytes()),
+            base_options=python.BaseOptions(model_asset_buffer=model.read_bytes()),  
             running_mode=vision.RunningMode.VIDEO, num_hands=2)
         bo_do = vision.HandLandmarker.create_from_options(tuy_chon)
         # Windows thử DirectShow; Linux sử dụng cách mở mặc định.
@@ -118,6 +116,19 @@ def main():
             if not ok:
                 raise RuntimeError("Mất hình camera. Hãy kiểm tra kết nối rồi mở lại.")
             anh = cv2.flip(anh, 1)
+            kich_thuoc = (max(1, cua_so.winfo_width()), max(1, cua_so.winfo_height()))
+            # Cắt giữa ảnh theo tỉ lệ cửa sổ, không kéo méo hình.
+            # Nhận diện trên vùng đã cắt để chỉ chấm tay đang nhìn thấy.
+            cao, rong = anh.shape[:2]
+            ti_le = kich_thuoc[0] / kich_thuoc[1]
+            if rong / cao > ti_le:
+                rong_moi = max(1, int(cao * ti_le))
+                x = (rong - rong_moi) // 2
+                anh = anh[:, x:x + rong_moi]
+            else:
+                cao_moi = max(1, int(rong / ti_le))
+                y = (cao - cao_moi) // 2
+                anh = anh[y:y + cao_moi, :]
             cao, rong = anh.shape[:2]
             rgb = cv2.cvtColor(anh, cv2.COLOR_BGR2RGB)
             moc = max(moc_cu + 1, int(time.monotonic() * 1000))
@@ -152,12 +163,12 @@ def main():
                             diem[thang - 1] += 1
                         ket_luan = ["Hòa!", "Bên trái thắng!", "Bên phải thắng!"][thang]
                         thong_bao.configure(text=f"{chot[0]} – {chot[1]}: {ket_luan}")
-                        bang_diem.configure(text=f"BÊN TRÁI: {diem[0]}                    BÊN PHẢI: {diem[1]}")
+                        diem_trai.configure(text=f"BÊN TRÁI: {diem[0]}")
+                        diem_phai.configure(text=f"BÊN PHẢI: {diem[1]}")
 
-            # Thu phóng vừa khung, giữ đúng tỉ lệ và không cắt ảnh.
-            kich_thuoc = (max(1, khung.winfo_width()), max(1, khung.winfo_height()))
+            # Ảnh phủ kín cửa sổ, chữ và nút nằm phía trên.
             hinh = Image.fromarray(cv2.cvtColor(anh, cv2.COLOR_BGR2RGB))
-            hinh = ImageOps.contain(hinh, kich_thuoc)
+            hinh = ImageOps.fit(hinh, kich_thuoc, method=Image.Resampling.BILINEAR)
             anh_tk = ImageTk.PhotoImage(hinh)
             camera.configure(image=anh_tk)
             camera.image = anh_tk
@@ -173,3 +184,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
