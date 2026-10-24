@@ -1,17 +1,9 @@
-"""Các phép tính và luật chơi. File này không mở camera hay cửa sổ."""
-
 from math import hypot
-
-
 def khoang_cach(a, b):
     return hypot(a[0] - b[0], a[1] - b[1])
-
-
 def nhan_dien(tay, rong, cao):
-    """Trả về Kéo/Búa/Bao; None nghĩa là chưa nhận diện rõ."""
     diem = [(p.x * rong, p.y * cao) for p in tay]
     duoi = []
-    # Đầu ngón và khớp giữa: trỏ, giữa, áp út, út.
     for dau, khop in [(8, 6), (12, 10), (16, 14), (20, 18)]:
         d1 = khoang_cach(diem[dau], diem[0])
         d2 = khoang_cach(diem[khop], diem[0])
@@ -23,8 +15,7 @@ def nhan_dien(tay, rong, cao):
         elif ti_le < 0.98:
             duoi.append(False)
         else:
-            return None  # Ngón đang co/duỗi dở, chưa kết luận.
-
+            return None
     if duoi == [False, False, False, False]:
         return "Búa"
     if duoi == [True, True, True, True]:
@@ -32,8 +23,6 @@ def nhan_dien(tay, rong, cao):
     if duoi == [True, True, False, False]:
         return "Kéo"
     return None
-
-
 def chia_hai_ben(danh_sach_tay):
     """Chia theo vị trí trong ảnh đã lật gương, không theo tay trái sinh học."""
     nhom = [[], []]
@@ -43,12 +32,10 @@ def chia_hai_ben(danh_sach_tay):
             nhom[0].append(tay)
         elif tam_x > 0.54:
             nhom[1].append(tay)
-    # Hai tay cùng một bên thì bên đó không hợp lệ.
     return [nhom[i][0] if len(nhom[i]) == 1 else None for i in range(2)]
 
 
 def cap_on_dinh(lich_su, bay_gio):
-    """Lấy cặp xuất hiện >=60% số khung trong 0,7 giây gần nhất."""
     gan_day = [(t, cap) for t, cap in lich_su if bay_gio - t <= 0.7]
     if len(gan_day) < 4 or gan_day[-1][0] - gan_day[0][0] < 0.3:
         return None
@@ -59,7 +46,6 @@ def cap_on_dinh(lich_su, bay_gio):
     if not dem:
         return None
     tot_nhat = max(dem, key=dem.get)
-    # Cặp ở khung cuối cũng phải đúng: không dùng kết quả cũ khi tay đã mất.
     if dem[tot_nhat] / len(gan_day) >= 0.6 and gan_day[-1][1] == tot_nhat:
         return tot_nhat
     return None
