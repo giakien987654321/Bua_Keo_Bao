@@ -46,6 +46,7 @@ def ve_khung(anh, tay, mau):
 
 def main():
     cua_so = tk.Tk()
+    cua_so.attributes("-fullscreen", True)
     cua_so.title("Kéo – Búa – Bao | Hai tay")
     cua_so.configure(bg=NEN)
     cua_so.resizable(False, False)
