@@ -20,7 +20,5 @@ echo Cai dat xong. Mo CHAY_GAME.bat de chay.
 pause
 exit /b 0
 :failed
-echo.
-echo Cai dat that bai.
 pause
 exit /b 1
