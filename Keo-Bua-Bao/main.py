@@ -1,4 +1,3 @@
-"""Chạy trò chơi kéo búa bao hai tay bằng camera."""
 import math
 import sys
 import time
@@ -26,7 +25,6 @@ def main():
     cua_so.configure(bg=NEN)
     cua_so.attributes("-fullscreen", True)
 
-    # Camera là nền toàn cửa sổ; nhãn chỉ có nền trắng quanh chữ.
     camera = tk.Label(cua_so, bg="black", borderwidth=0)
     camera.place(x=0, y=0, relwidth=1, relheight=1)
 
@@ -96,7 +94,6 @@ def main():
             base_options=python.BaseOptions(model_asset_buffer=model.read_bytes()),  
             running_mode=vision.RunningMode.VIDEO, num_hands=2)
         bo_do = vision.HandLandmarker.create_from_options(tuy_chon)
-        # Windows thử DirectShow; Linux sử dụng cách mở mặc định.
         cam = cv2.VideoCapture(SO_CAMERA, cv2.CAP_DSHOW) if sys.platform == "win32" else cv2.VideoCapture(SO_CAMERA)
         ok, anh = cam.read()
         if not ok and sys.platform == "win32":
@@ -117,8 +114,6 @@ def main():
                 raise RuntimeError("Mất hình camera. Hãy kiểm tra kết nối rồi mở lại.")
             anh = cv2.flip(anh, 1)
             kich_thuoc = (max(1, cua_so.winfo_width()), max(1, cua_so.winfo_height()))
-            # Cắt giữa ảnh theo tỉ lệ cửa sổ, không kéo méo hình.
-            # Nhận diện trên vùng đã cắt để chỉ chấm tay đang nhìn thấy.
             cao, rong = anh.shape[:2]
             ti_le = kich_thuoc[0] / kich_thuoc[1]
             if rong / cao > ti_le:
@@ -137,7 +132,6 @@ def main():
             hai_tay = chia_hai_ben(ket_qua.hand_landmarks)
             cap = tuple(nhan_dien(tay, rong, cao) if tay is not None else None for tay in hai_tay)
             cu_chi.configure(text=f"Bên trái: {cap[0] or 'Chưa rõ'}    |    Bên phải: {cap[1] or 'Chưa rõ'}")
-            # Vẽ các điểm bàn tay và đường chia hai bên.
             for tay in hai_tay:
                 if tay is not None:
                     for p in tay:
@@ -166,7 +160,6 @@ def main():
                         diem_trai.configure(text=f"BÊN TRÁI: {diem[0]}")
                         diem_phai.configure(text=f"BÊN PHẢI: {diem[1]}")
 
-            # Ảnh phủ kín cửa sổ, chữ và nút nằm phía trên.
             hinh = Image.fromarray(cv2.cvtColor(anh, cv2.COLOR_BGR2RGB))
             hinh = ImageOps.fit(hinh, kich_thuoc, method=Image.Resampling.BILINEAR)
             anh_tk = ImageTk.PhotoImage(hinh)
