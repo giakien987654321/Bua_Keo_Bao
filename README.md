@@ -15,3 +15,7 @@ Yêu cầu: Windows, Python và webcam; có Internet khi cài thư viện.
 - Bấm **R** để đặt lại điểm.
 - Bấm **F11** để bật/tắt toàn màn hình.
 - Bấm **Esc** để thoát.
+
+## Video demo
+
+demo trò chơi tại đây:  https://youtu.be/VdB_G7XHgX8?si=MhhuYs4BfCpnSywA
